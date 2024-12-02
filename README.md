@@ -80,7 +80,9 @@
 **Tasks for Students**:
 1. **Write the Dockerfile**: Please write a Dockerfile that meets the requirements.
 2. **Build and Run the Image**: Be sure you can build the image (`docker build -t custom-mysql .`) and run it (`docker run -d -p 3306:3306 custom-mysql`).
-3. **Verify Initialization** *optional*: You can use the `MySQL` extension (extension ID is "cweijan.vscode-mysql-client2") in VSCode to connect to the MySQL server and verify that the database and tables from the `init.sql` script are correctly set up.
+3. **Check the Logs**: Use `docker logs` on the new container you built from your image to see if mysqld was successfully started up.
+4. **Verify Initialization** *optional*: You can use the `MySQL` extension (extension ID is "cweijan.vscode-mysql-client2") in VSCode to connect to the MySQL server and verify that the database and tables from the `init.sql` script are correctly set up.
+    - The user will be root, the password is whatever you set for the envvar `MYSQL_PASSWORD`, and the database is also whatever you set for the envvar `MYSQL_DATABASE`
     - *optional* If you prefer doing things by command line then you can choose to install the mysql client in your terminal and connect to the container. This is left to your discretion to accomplish if you so choose. Message me after class if you need assistance with this.
 
 **Requirements**:
@@ -99,6 +101,7 @@
 - **MySQL Command**: If you're interested in the CMD that image `mysql:9` runs by default then you can find the image [here in dockerhub](https://hub.docker.com/_/mysql). You can then go to `Tags` for that image and find the tag `9`. This will show you effectively the Dockerfile for this image, the last CMD statement in the layers for this image is the one that will run by default.
 - **Environment Variables** (`ENV`): When we use the `ENV <some variable name>` keyword we are stating to Docker that there should be an environment variable setup at this point in the image build process. We can also set a default value that can be overridden at the command line by doing `ENV SOME_VARIABLE="some default value"`
 - **Initialization Script**: Use `COPY` to place the `init.sql` script in the appropriate directory (`/docker-entrypoint-initdb.d/`) so it runs automatically when the container starts.
+- **Docker Image Commands**: You might notice that there's two different commands listed to build an image, 1) `docker image build ...` and 2) `docker build`. These are synonamous with each other, they both refer to the same command
 
 **BONUS**:
 - **Background**: There is a path location specified in the image layers for the `mysql:9` image by the `VOLUME` keyword. This location is used by the mysqld server to store all the database information, i.e. database files, tables, etc. Currently in our implementation this data is volatile, meaning that if we rebuild the container then we've lost all that data. This behavior is, of course, undesirable.
