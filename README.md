@@ -13,6 +13,8 @@
      # Set the working directory
      WORKDIR /app
 
+     ENV SECRET_KEY
+
      # Copy the requirements file and install dependencies
      COPY ./source/requirements.txt /app/requirements.txt
      RUN pip install -r requirements.txt
@@ -75,50 +77,39 @@
 
 **Objective**: Challenge students to write a Dockerfile that creates a custom MySQL container with some specific configuration. This task will test their understanding of the Dockerfile commands and how to customize container behavior.
 
+**Tasks for Students**:
+1. **Write the Dockerfile**: Please write a Dockerfile that meets the requirements.
+2. **Build and Run the Image**: Be sure you can build the image (`docker build -t custom-mysql .`) and run it (`docker run -d -p 3306:3306 custom-mysql`).
+3. **Verify Initialization** *optional*: You can use the `MySQL` extension (extension ID is "cweijan.vscode-mysql-client2") in VSCode to connect to the MySQL server and verify that the database and tables from the `init.sql` script are correctly set up.
+    - *optional* If you prefer doing things by command line then you can choose to install the mysql client in your terminal and connect to the container. This is left to your discretion to accomplish if you so choose. Message me after class if you need assistance with this.
+
 **Requirements**:
+1. **Name your Dockerfile**: Since you already have a dockerfile named `Dockerfile` you'll want to pick a different name for this one. Suggestion: `Dockerfile.mysql`
 1. **Use an Official Base Image**: Start from `mysql:8.0`.
 2. **Set Environment Variables**:
    - Set `MYSQL_ROOT_PASSWORD`, `MYSQL_DATABASE`, `MYSQL_USER`, and `MYSQL_PASSWORD` as environment variables.
+   - These environment variables (a.k.a. envvars) can be set to anything you want, just be sure the values are lowercase, one word, and (for the sake of this task, preferably) don't have symbols.
 3. **Add Custom Initialization Script**:
    - Copy a SQL script (`init.sql`) to the container to initialize the database with some tables and data.
-4. **Expose the Database Port**: Expose port `3306`.
+4. **Expose the Database Port**: Expose port `3306`. This is the default port number for mysql.
 5. **Command to Run**: Use the default MySQL command to start the server.
+6. **Build your image**: Use `docker image build ...` and investigate which option will allow you to specify the name of the dockerfile that you want to build an image from. By default docker looks at: `"PATH/Dockerfile"`. When you build your image you'll need to pass in the `Dockerfile.mysql` (or whatever you named it) to the option you found.
 
 **Hints**:
-- **Environment Variables** (`ENV`): Explain how to set default values for passwords and database names.
-- **Initialization Script**: Guide students on how to use `COPY` to place the `init.sql` script in the appropriate directory (`/docker-entrypoint-initdb.d/`) so it runs automatically when the container starts.
+- **MySQL Command**: If you're interested in the CMD that image `mysql:9` runs by default then you can find the image [here in dockerhub](https://hub.docker.com/_/mysql). You can then go to `Tags` for that image and find the tag `9`. This will show you effectively the Dockerfile for this image, the last CMD statement in the layers for this image is the one that will run by default.
+- **Environment Variables** (`ENV`): When we use the `ENV <some variable name>` keyword we are stating to Docker that there should be an environment variable setup at this point in the image build process. We can also set a default value that can be overridden at the command line by doing `ENV SOME_VARIABLE="some default value"`
+- **Initialization Script**: Use `COPY` to place the `init.sql` script in the appropriate directory (`/docker-entrypoint-initdb.d/`) so it runs automatically when the container starts.
 
-**Example Dockerfile** (for guidance, not a complete solution):
-```dockerfile
-# Use the official MySQL base image
-FROM mysql:8.0
+**BONUS**:
+- **Background**: There is a path location specified in the image layers for the `mysql:9` image by the `VOLUME` keyword. This location is used by the mysqld server to store all the database information, i.e. database files, tables, etc. Currently in our implementation this data is volatile, meaning that if we rebuild the container then we've lost all that data. This behavior is, of course, undesirable.
+- **Task**: Investigate the `docker run` command to see which options we can use to make a volume that mounts the location specified in the image layers by the `VOLUME` statement.
 
-# Set environment variables for MySQL
-ENV MYSQL_ROOT_PASSWORD=rootpassword
-ENV MYSQL_DATABASE=exampledb
-ENV MYSQL_USER=user
-ENV MYSQL_PASSWORD=userpassword
-
-# Copy the initialization script
-COPY init.sql /docker-entrypoint-initdb.d/
-
-# Expose MySQL port
-EXPOSE 3306
-```
-
-**Tasks for Students**:
-1. **Write the Dockerfile**: Have them write a Dockerfile that meets the requirements.
-2. **Build and Run the Image**: Instruct students to build the image (`docker build -t custom-mysql .`) and run it (`docker run -d -p 3306:3306 custom-mysql`).
-3. **Verify Initialization**: Ask them to connect to the MySQL server and verify that the database and tables from the `init.sql` script are correctly set up.
 
 **Wrap-Up Discussion**:
-- **Review Key Concepts**: Go over the most challenging parts students faced, like setting environment variables or understanding how `COPY` works.
-- **Common Pitfalls**: Highlight common mistakes (e.g., incorrect paths, missing dependencies).
+- **Review Key Concepts**: What parts of this challenge were the most difficult for you, e.g. like setting environment variables or understanding how `COPY` works?
 - **Q&A**: Open the floor for any remaining questions.
 
-**Extensions (Optional)**:
-- Ask students to create a multi-stage Dockerfile to reduce the image size.
-- Challenge them to create a Docker Compose file to orchestrate the Flask app and MySQL container together.
+
 
 **FAQ/Troubleshooting**:
 
