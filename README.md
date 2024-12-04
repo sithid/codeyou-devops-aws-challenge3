@@ -9,25 +9,34 @@
      ```dockerfile
      # Use an official Python runtime as the base image
      FROM python:3.9
-
-     # Set the working directory
-     WORKDIR /app
-
-     ENV SECRET_KEY
-
-     # Copy the requirements file and install dependencies
-     COPY ./source/requirements.txt /app/requirements.txt
-     RUN pip install -r requirements.txt
-
-     # Copy the rest of the application code
-     COPY ./source/http /app
-
-     # Expose the application port
-     EXPOSE 5000
-
-     # Define the command to run the app
-     CMD ["flask", "run", "--host=0.0.0.0"]
      ```
+    - Now we want to start adding more to the Dockerfile. Let's set a place where we can work out of. We'll set a working directory of `/app`
+        ```
+        # Set the working directory
+        WORKDIR /app
+        ```
+    - Now we need to copy the dependencies over and install them, so let's add this to our Dockerfile
+        ```
+        # Copy the requirements file and install dependencies
+        COPY ./source/requirements.txt /app/requirements.txt
+        RUN pip install -r requirements.txt
+        ```
+    - Everything else needs copied over now
+        ```
+        # Copy the rest of the application code
+        COPY ./source/http /app
+        ```
+    - Next, we would know from using django that it runs by default on port 5000. We should add a statement in the Dockerfile so that
+    this knowledge is clear in the layers.
+        ```
+        # Expose the application port
+        EXPOSE 5000
+        ```
+    - Last we need to add the default command that's going to run when we start the container:
+        ```
+        # Define the command to run the app
+        CMD ["flask", "run", "--host=0.0.0.0"]
+        ```
    - **Explain Each Step**:
      - **Base Image** (`FROM`): Selecting an appropriate base image. Here, we are using Python 3.9 to ensure we have the runtime environment needed for our Flask app.
      - **Working Directory** (`WORKDIR`): Setting the working directory to `/app`. This is where all subsequent commands will be executed, and it helps keep the file structure organized.
@@ -43,6 +52,10 @@
      This line sets the `SECRET_KEY` for Flask using the value from an environment variable `SECRET_KEY`. If the variable is not set, it defaults to `'secret string'`. To provide this value when running the container, you can use the `-e` flag:
      ```sh
      docker run -p 6001:5000 -e SECRET_KEY=mysecretkey flask-app
+     ```
+     We should also add a statement to our Dockerfile to reflect this:
+     ```
+     ENV SECRET_KEY
      ```
      This is useful for managing sensitive information like secret keys without hardcoding them in your application.
 4. **Build and Debug the Docker Container**:
@@ -87,7 +100,7 @@
 
 **Requirements**:
 1. **Name your Dockerfile**: Since you already have a dockerfile named `Dockerfile` you'll want to pick a different name for this one. Suggestion: `Dockerfile.mysql`
-1. **Use an Official Base Image**: Start from `mysql:8.0`.
+1. **Use an Official Base Image**: Start from `mysql:9.0`.
 2. **Set Environment Variables**:
    - Set `MYSQL_ROOT_PASSWORD`, `MYSQL_DATABASE`, `MYSQL_USER`, and `MYSQL_PASSWORD` as environment variables.
    - These environment variables (a.k.a. envvars) can be set to anything you want, just be sure the values are lowercase, one word, and (for the sake of this task, preferably) don't have symbols.
