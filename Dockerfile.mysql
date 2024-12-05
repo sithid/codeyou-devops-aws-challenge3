@@ -1,0 +1,19 @@
+FROM mysql:9.0
+
+WORKDIR /app
+
+COPY init.sql /docker-entrypoint-initdb.d/
+
+EXPOSE 3306
+
+ENV MYSQL_ROOT_PASSWORD="toast"
+
+ENV MYSQL_DATABASE="jimslo-mysql"
+
+ENV MYSQL_USER="jglo"
+
+ENV MYSQL_PASSWORD="toast"
+
+ENTRYPOINT ["docker-entrypoint.sh"]
+
+CMD ["mysqld"]
